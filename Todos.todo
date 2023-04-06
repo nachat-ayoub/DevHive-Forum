@@ -28,6 +28,7 @@
         ☐ username
         ☐ email
         ☐ password
+
     ☐ Questions
         ☐ id (primary key)
         ☐ title
@@ -35,6 +36,7 @@
         ☐ user_id (foreign key referencing Users.id)
         ☐ created_at
         ☐ updated_at
+        
     ☐ Answers
         ☐ id (primary key)
         ☐ body
