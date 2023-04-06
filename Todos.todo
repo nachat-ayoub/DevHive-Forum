@@ -7,3 +7,38 @@
     ☐ Create New Question Page
     ☐ Edit Question Page
         ☐ Delete Question Button
+
+☐ Api Routes :
+    ☐ GET       /api/home                   Returns a list of recent or popular questions.
+    ☐ POST      /api/login                  Authenticates a user with their username and password.
+    ☐ POST      /api/signup                 Creates a new user account with the provided information.
+    ☐ GET       /api/questions              Returns a list of all questions.
+    ☐ GET       /api/questions/[id]         Returns details of a specific question with the given ID.
+    ☐ POST      /api/questions              Creates a new question with the provided information.
+    ☐ PUT       /api/questions/[id]         Updates a specific question with the given ID.
+    ☐ DELETE    /api/questions/[id]         Deletes a specific question with the given ID.
+    ☐ GET       /api/search?q=[query]       Searches for questions that match the given query.
+    ☐ POST      /api/answers                Adds a new answer to a specific question.
+    ☐ PUT       /api/answers/[id]           Updates a specific answer with the given ID.
+    ☐ DELETE    /api/answers/[id]           Deletes a specific answer with the given ID.
+
+☐ DB Structure :
+    ☐ Users
+        ☐ id (primary key)
+        ☐ username
+        ☐ email
+        ☐ password
+    ☐ Questions
+        ☐ id (primary key)
+        ☐ title
+        ☐ body
+        ☐ user_id (foreign key referencing Users.id)
+        ☐ created_at
+        ☐ updated_at
+    ☐ Answers
+        ☐ id (primary key)
+        ☐ body
+        ☐ user_id (foreign key referencing Users.id)
+        ☐ question_id (foreign key referencing Questions.id)
+        ☐ created_at
+        ☐ updated_at
