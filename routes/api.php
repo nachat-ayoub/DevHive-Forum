@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\QuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,4 +37,13 @@ Route::group(['prefix' => 'questions'], function () {
     Route::get('/{id}', [QuestionController::class, 'show']);
     Route::put('/{id}', [QuestionController::class, 'update']);
     Route::delete('/{id}', [QuestionController::class, 'destroy']);
+});
+
+// ? Answers Routes :
+Route::group(['prefix' => 'answers'], function () {
+    Route::post('/', [AnswerController::class, 'store']);
+    // Route::get('/', [AnswerController::class, 'index']);
+    // Route::get('/{id}', [AnswerController::class, 'show']);
+    Route::put('/{id}', [AnswerController::class, 'update']);
+    Route::delete('/{id}', [AnswerController::class, 'destroy']);
 });

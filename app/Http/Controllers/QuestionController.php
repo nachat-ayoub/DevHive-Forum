@@ -78,7 +78,7 @@ class QuestionController extends Controller {
      * Display the specified resource.
      */
     public function show(string $id) {
-        $question = Question::find($id);
+        $question = Question::with('answers')->find($id);
 
         if (!$question) {
             return response()->json([
