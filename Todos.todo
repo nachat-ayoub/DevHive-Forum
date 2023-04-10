@@ -9,27 +9,38 @@
         ☐ Delete Question Button
 
 ☐ Api Routes :
-    ☐ GET       /api/home                   Returns a list of recent or popular questions.
-    ☐ POST      /api/login                  Authenticates a user with their username and password.
-    ☐ POST      /api/signup                 Creates a new user account with the provided information.
-    ☐ GET       /api/questions              Returns a list of all questions.
-    ☐ GET       /api/questions/[id]         Returns details of a specific question with the given ID.
-    ☐ POST      /api/questions              Creates a new question with the provided information.
-    ☐ PUT       /api/questions/[id]         Updates a specific question with the given ID.
-    ☐ DELETE    /api/questions/[id]         Deletes a specific question with the given ID.
-    ☐ GET       /api/search?q=[query]       Searches for questions that match the given query.
-    ☐ POST      /api/answers                Adds a new answer to a specific question.
-    ☐ PUT       /api/answers/[id]           Updates a specific answer with the given ID.
-    ☐ DELETE    /api/answers/[id]           Deletes a specific answer with the given ID.
 
+    ✔ Home Route : @done(23-04-07 13:37)
+        ☐ GET       /api/home                   Returns a list of recent or popular questions.
+
+    ☐ Auth Routes
+        ☐ POST      /api/login                  Authenticates a user with their username and password.
+        ☐ POST      /api/signup                 Creates a new user account with the provided information.
+
+    ☐ Questions Answers :
+        ✔ GET       /api/questions              Returns a list of all questions. @done(23-04-07 13:46)
+        ✔ GET       /api/questions/[id]         Returns details of a specific question with the given ID. @done(23-04-07 13:46)
+        ✔ POST      /api/questions              Creates a new question with the provided information. @done(23-04-07 13:46)
+        ✔ PUT       /api/questions/[id]         Updates a specific question with the given ID. @done(23-04-07 13:46)
+        ✔ DELETE    /api/questions/[id]         Deletes a specific question with the given ID. @done(23-04-07 13:46)
+        ✔ GET       /api/search?q=[query]       Searches for questions that match the given query. @done(23-04-07 13:48)
+
+    ☐ Vote Answers :
+        ☐ POST      /api/answers                Adds a new answer to a specific question.
+        ☐ PUT       /api/answers/[id]           Updates a specific answer with the given ID.
+        ☐ DELETE    /api/answers/[id]           Deletes a specific answer with the given ID.
+
+    ☐ Vote Routes :
+        ☐ POST      /api/answers/[id]/vote      Adds a new vote to the answer if not existed and the user did not vote yet or if the vote is the opposite.
+    
 ☐ DB Structure :
-    ☐ Users
+    ✔ Users @done(23-04-07 09:34)
         ☐ id (primary key)
         ☐ username
         ☐ email
         ☐ password
 
-    ☐ Questions
+    ✔ Questions @done(23-04-07 09:34)
         ☐ id (primary key)
         ☐ title
         ☐ body
@@ -37,10 +48,16 @@
         ☐ created_at
         ☐ updated_at
         
-    ☐ Answers
+    ✔ Answers @done(23-04-07 09:34)
         ☐ id (primary key)
         ☐ body
         ☐ user_id (foreign key referencing Users.id)
         ☐ question_id (foreign key referencing Questions.id)
         ☐ created_at
         ☐ updated_at
+
+
+    ✔ Vote : @done(23-04-07 09:34)
+        ☐ answer_id
+        ☐ user_id
+        ☐ value (1 or -1)
