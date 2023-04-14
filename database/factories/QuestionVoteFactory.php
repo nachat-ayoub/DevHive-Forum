@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Answer>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\QuestionVote>
  */
-class AnswerFactory extends Factory {
+class QuestionVoteFactory extends Factory {
     /**
      * Define the model's default state.
      *
@@ -15,10 +15,11 @@ class AnswerFactory extends Factory {
      */
     public function definition(): array
     {
+        $vote_values = [1, -1];
         return [
             'user_id' => fake()->numberBetween(1, 2),
-            'question_id' => 1,
-            'body' => fake()->unique()->realTextBetween(20, 100),
+            'question_id' => fake()->numberBetween(1, 2),
+            'value' => $vote_values[rand(0, 1)],
         ];
     }
 }

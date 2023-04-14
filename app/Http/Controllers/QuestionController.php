@@ -3,17 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
+use App\Models\QuestionVote;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class QuestionController extends Controller {
     /**
      * Display a listing of the resource with filters.
      */
+    public function index(Request $request) {
+        $questions = Question::with('answers')->withCount('votes')->get();
 
-    public function index(Request $req) {
+        foreach ($questions as $question) {
+            $question['question_total_votes'] = $question->votes->sum('value');
+
+            foreach ($question->answers as $answer) {
+                $answer['answers_total_votes'] = $answer->votes->sum('value');
+            }
+        }
 
         $data = [
-            'questions' => Question::all(),
+            'questions' => $questions,
         ];
 
         return response()->json(['status' => 'success', 'data' => $data], 200);
@@ -24,7 +35,7 @@ class QuestionController extends Controller {
      */
 
     public function home(Request $req) {
-        $filter = $req->query('filter') ?? 'hot';
+        $filter = $req->query('filter');
 
         $questions = [];
 
@@ -39,8 +50,16 @@ class QuestionController extends Controller {
                 )
                 ->orderByDesc('votes.total_votes')
                 ->get();
-        } else if ($filter == 'recent') {
-            $questions = Question::orderByDesc('created_at')->get();
+        } else {
+            $questions = Question::with('answers')->withCount('votes')->orderByDesc('created_at')->get();
+
+            foreach ($questions as $question) {
+                $question['question_total_votes'] = $question->votes->sum('value');
+
+                foreach ($question->answers as $answer) {
+                    $answer['answers_total_votes'] = $answer->votes->sum('value');
+                }
+            }
         }
 
         $data = [
@@ -69,7 +88,7 @@ class QuestionController extends Controller {
                 'status' => 'success', 'data' => ['question' => $question],
             ], 200);
 
-        } catch (\Illuminate\Validation\ValidationException$th) {
+        } catch (ValidationException $th) {
             return $th->validator->errors();
         }
     }
@@ -78,7 +97,7 @@ class QuestionController extends Controller {
      * Display the specified resource.
      */
     public function show(string $id) {
-        $question = Question::with('answers')->find($id);
+        $question = Question::with('answers')->withCount('votes')->get()->find($id);
 
         if (!$question) {
             return response()->json([
@@ -152,6 +171,65 @@ class QuestionController extends Controller {
         return response()->json([
             'status' => 'success', 'data' => [
                 'message' => 'Question deleted successfully',
+            ],
+        ], 204);
+    }
+
+    /**
+     * Vote for resource (upVote/downVote).
+     */
+    public function vote(Request $request, string $id) {
+        $vote_data = $request->validate([
+            'vote' => 'required|integer|min:-1|max:1',
+        ]);
+
+        $question = Question::find($id);
+
+        if (!$question) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => 'Question not found.'],
+            ], 404);
+        }
+
+        // Save vote
+        // TODO: later get the user from the token (user will be in $request) :
+        $user = User::find(1);
+
+        $already_voted = QuestionVote::where('question_id', $question->id)->where('user_id', $user->id)->get();
+
+        if ($already_voted->count() > 0) {
+            $already_voted = $already_voted[0];
+        } else {
+            $already_voted = null;
+        }
+
+        if ($already_voted) {
+            $voted_same_value = $already_voted->value === $vote_data['vote'];
+            // $voted_same_value = true;
+
+            if ($voted_same_value) {
+                // * Delete vote :
+                $already_voted->delete();
+
+                return response()->json([
+                    'status' => 'success', 'data' => ['message' => 'Question unvoted successfully.'],
+                ], 200);
+            } else {
+                // * Update vote :
+                $already_voted->update(['value' => $already_voted->value > 0 ? -1 : 1]);
+
+                return response()->json([
+                    'status' => 'success', 'data' => ['message' => 'Question vote updated successfully.'],
+                ], 200);
+            }
+        }
+
+        // * $vote_data > 0 then upvote (1) else downvote (-1) :
+        QuestionVote::create(['question_id' => $question->id, 'user_id' => $user->id, 'value' => $vote_data > 0 ? 1 : -1]);
+
+        return response()->json([
+            'status' => 'success', 'data' => [
+                'message' => 'Question voted successfully',
             ],
         ], 204);
     }

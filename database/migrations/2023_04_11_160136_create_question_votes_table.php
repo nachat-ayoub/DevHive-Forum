@@ -9,10 +9,10 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up(): void {
-        Schema::create('votes', function (Blueprint $table) {
+        Schema::create('question_votes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('answer_id');
-            $table->foreignId('user_id');
+            $table->foreignId('question_id')->constrained();
+            $table->foreignId('user_id')->constrained();
             $table->integer('value');
             $table->timestamps();
         });
@@ -22,6 +22,6 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function down(): void {
-        Schema::dropIfExists('votes');
+        Schema::dropIfExists('question_votes');
     }
 };

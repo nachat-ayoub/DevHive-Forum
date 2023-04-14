@@ -22,10 +22,7 @@ class Answer extends Model {
     }
 
     public function votes() {
-        return $this->hasMany(Vote::class);
+        return $this->hasMany(AnswerVote::class);
     }
 
-    public function getTotalVotesAttribute() {
-        return $this->votes()->sum('value');
-    }
 }

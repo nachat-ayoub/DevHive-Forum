@@ -1,17 +1,7 @@
-☐ Pages :
-    ☐ Home Page
-    ☐ Login Page
-    ☐ Signup Page
-    ☐ Question Page
-    ☐ Question Search Page
-    ☐ Create New Question Page
-    ☐ Edit Question Page
-        ☐ Delete Question Button
-
 ☐ Api Routes :
 
     ✔ Home Route : @done(23-04-07 13:37)
-        ☐ GET       /api/home                   Returns a list of recent or popular questions.
+        ✔ GET       /api/home                   Returns a list of recent or popular questions. @done(23-04-14 10:32)
 
     ☐ Auth Routes
         ☐ POST      /api/login                  Authenticates a user with their username and password.
@@ -26,13 +16,14 @@
         ✔ GET       /api/search?q=[query]       Searches for questions that match the given query. @done(23-04-07 13:48)
 
     ☐ Vote Answers :
-        ☐ POST      /api/answers                Adds a new answer to a specific question.
-        ☐ PUT       /api/answers/[id]           Updates a specific answer with the given ID.
-        ☐ DELETE    /api/answers/[id]           Deletes a specific answer with the given ID.
+        ✔ POST      /api/answers                Adds a new answer to a specific question. @done(23-04-14 10:32)
+        ✔ PUT       /api/answers/[id]           Updates a specific answer with the given ID. @done(23-04-14 10:32)
+        ✔ DELETE    /api/answers/[id]           Deletes a specific answer with the given ID. @done(23-04-14 10:32)
 
     ☐ Vote Routes :
-        ☐ POST      /api/answers/[id]/vote      Adds a new vote to the answer if not existed and the user did not vote yet or if the vote is the opposite.
-    
+        ✔ POST      /api/questions/[id]/vote      Adds a new vote to the question if not existed and the user did not vote yet or if the vote is the opposite. @done(23-04-14 10:34)
+        ✔ POST      /api/answers/[id]/vote      Adds a new vote to the answer if not existed and the user did not vote yet or if the vote is the opposite. @done(23-04-14 10:34)
+
 ☐ DB Structure :
     ✔ Users @done(23-04-07 09:34)
         ☐ id (primary key)
@@ -47,7 +38,7 @@
         ☐ user_id (foreign key referencing Users.id)
         ☐ created_at
         ☐ updated_at
-        
+
     ✔ Answers @done(23-04-07 09:34)
         ☐ id (primary key)
         ☐ body

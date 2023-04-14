@@ -5,7 +5,9 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Answer;
+use App\Models\AnswerVote;
 use App\Models\Question;
+use App\Models\QuestionVote;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -18,11 +20,35 @@ class DatabaseSeeder extends Seeder {
         Question::factory(5)->create();
         Answer::factory(4)->create();
 
-        // Question::factory()->create([
-        //     'title' => 'Test Question!',
-        //     'body' => 'This is my test question please help me!',
-        //     'user_id' => 1,
-        // ]);
+        // QuestionVote::factory(10)->create();
+        // AnswerVote::factory(5)->create();
+
+        QuestionVote::factory()->create([
+            'user_id' => 1,
+            'question_id' => 1,
+            'value' => 1,
+        ]);
+        QuestionVote::factory()->create([
+            'user_id' => 2,
+            'question_id' => 1,
+            'value' => 1,
+        ]);
+        QuestionVote::factory()->create([
+            'user_id' => 3,
+            'question_id' => 1,
+            'value' => 1,
+        ]);
+
+        AnswerVote::factory()->create([
+            'user_id' => 1,
+            'answer_id' => 1,
+            'value' => 1,
+        ]);
+        AnswerVote::factory()->create([
+            'user_id' => 2,
+            'answer_id' => 1,
+            'value' => 1,
+        ]);
 
         // User::factory()->create([
         //     'name' => 'Test User',

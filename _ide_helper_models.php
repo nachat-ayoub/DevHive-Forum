@@ -20,11 +20,11 @@ namespace App\Models{
  * @property int $question_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read mixed $total_votes
  * @property-read \App\Models\Question|null $question
  * @property-read \Illuminate\Foundation\Auth\User|null $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Vote> $votes
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AnswerVote> $votes
  * @property-read int|null $votes_count
+ * @method static \Database\Factories\AnswerFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Answer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Answer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Answer query()
@@ -36,6 +36,32 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Answer whereUserId($value)
  */
 	class Answer extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\AnswerVote
+ *
+ * @property int $id
+ * @property int $answer_id
+ * @property int $user_id
+ * @property int $value
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Answer $answer
+ * @property-read \App\Models\User $user
+ * @method static \Database\Factories\AnswerVoteFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote query()
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote whereAnswerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AnswerVote whereValue($value)
+ */
+	class AnswerVote extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -53,6 +79,9 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Answer> $answers
  * @property-read int|null $answers_count
  * @property-read \App\Models\User|null $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\QuestionVote> $votes
+ * @property-read int|null $votes_count
+ * @method static \Database\Factories\QuestionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Question newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Question newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Question query()
@@ -64,6 +93,32 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Question whereUserId($value)
  */
 	class Question extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\QuestionVote
+ *
+ * @property int $id
+ * @property int $question_id
+ * @property int $user_id
+ * @property int $value
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Question $question
+ * @property-read \App\Models\User $user
+ * @method static \Database\Factories\QuestionVoteFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote query()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionVote whereValue($value)
+ */
+	class QuestionVote extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -100,35 +155,5 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  */
 	class User extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * App\Models\Vote
- *
- * @property int $id
- * @property int $answer_id
- * @property int|null $question_id
- * @property int $user_id
- * @property int $value
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Answer|null $answer
- * @property-read \App\Models\Question|null $question
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|Vote forAnswer($answer_id)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote forQuestion($question_id)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Vote newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Vote query()
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereAnswerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereQuestionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vote whereValue($value)
- */
-	class Vote extends \Eloquent {}
 }
 

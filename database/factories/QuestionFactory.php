@@ -16,7 +16,7 @@ class QuestionFactory extends Factory {
     public function definition(): array
     {
         return [
-            'user_id' => 1,
+            'user_id' => fake()->numberBetween(1, 2),
             'title' => fake()->unique()->text(50),
             'body' => fake()->unique()->realTextBetween(20, 100),
         ];
