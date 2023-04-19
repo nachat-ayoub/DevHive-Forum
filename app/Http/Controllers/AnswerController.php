@@ -6,6 +6,7 @@ use App\Models\Answer;
 use App\Models\AnswerVote;
 use App\Models\User;
 use App\Models\Vote;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -24,11 +25,11 @@ class AnswerController extends Controller {
         try {
             $answer_data = $request->validate([
                 'question_id' => 'required|exists:questions,id',
-                'user_id' => 'required|exists:users,id',
                 'body' => 'required',
             ]);
 
             // If validation passes, create a new question
+            $answer_data['user_id'] = Auth::user()->id;
             $answer = Answer::create($answer_data);
 
             return response()->json([
@@ -59,6 +60,14 @@ class AnswerController extends Controller {
             ], 404);
         }
 
+        // DONE: check if user has authorization:
+        $user = Auth::user();
+        if ($user->id != $answer->user->id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't update this Answer, it's not your's."],
+            ], 400);
+        }
+
         $answer_data = $request->validate([
             'body' => 'required',
         ]);
@@ -82,6 +91,14 @@ class AnswerController extends Controller {
             return response()->json([
                 'status' => 'error', 'data' => ['message' => 'Answer not found.'],
             ], 404);
+        }
+
+        // DONE: check if user has authorization:
+        $user = Auth::user();
+        if ($user->id != $answer->user->id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't delete this Answer, it's not your's."],
+            ], 400);
         }
 
         $answer->delete();
@@ -111,8 +128,15 @@ class AnswerController extends Controller {
             }
 
             // Save vote
-            // TODO: later get the user from the token (user will be in $request when adding the auth middleware) :
-            $user = User::find(1);
+            // DONE: later get the user from the token :
+            $user = Auth::user();
+
+            // DONE: check if user resource (selfe voting not allowed) :
+            if ($user->id != $answer->user_id) {
+                return response()->json([
+                    'status' => 'error', 'data' => ['message' => "You can't vote for your own Answer, it's not allowed."],
+                ], 400);
+            }
 
             $already_voted = AnswerVote::where('answer_id', $answer->id)->where('user_id', $user->id)->get();
 

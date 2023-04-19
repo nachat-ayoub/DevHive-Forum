@@ -24,19 +24,14 @@ class DatabaseSeeder extends Seeder {
         // AnswerVote::factory(5)->create();
 
         QuestionVote::factory()->create([
-            'user_id' => 1,
-            'question_id' => 1,
-            'value' => 1,
-        ]);
-        QuestionVote::factory()->create([
             'user_id' => 2,
             'question_id' => 1,
-            'value' => 1,
+            'value' => -1,
         ]);
         QuestionVote::factory()->create([
             'user_id' => 3,
             'question_id' => 1,
-            'value' => 1,
+            'value' => -1,
         ]);
 
         AnswerVote::factory()->create([

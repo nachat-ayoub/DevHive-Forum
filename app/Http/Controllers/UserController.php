@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Auth;
+use Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -88,6 +88,8 @@ class UserController extends Controller {
             $user_data = $request->validate([
                 'email' => 'required|string|exists:users',
                 'password' => ['required', 'string', Password::defaults()],
+            ], [
+                'email.exists' => 'Invalid credentials.',
             ]);
 
             if (!Auth::attempt($user_data)) {
@@ -112,6 +114,21 @@ class UserController extends Controller {
                 ],
             ]);
 
+        } catch (ValidationException $ex) {
+            return $ex->validator->errors();
+        }
+    }
+
+    public function logout(Request $request) {
+        try {
+            Auth::user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'message' => 'User logout successfully.',
+                ],
+            ]);
         } catch (ValidationException $ex) {
             return $ex->validator->errors();
         }

@@ -9,12 +9,12 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up(): void {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('question_statuses', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('body');
-            $table->foreignId('user_id');
-            $table->integer('views')->default(0);
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('question_id')->constrained();
+            $table->foreignId('answer_id')->constrained();
+            $table->boolean('answered')->default(false);
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function down(): void {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('question_statuses');
     }
 };

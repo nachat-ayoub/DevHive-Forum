@@ -74,10 +74,12 @@ namespace App\Models{
  * @property string $title
  * @property string $body
  * @property int $user_id
+ * @property int $views
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Answer> $answers
  * @property-read int|null $answers_count
+ * @property-read \App\Models\QuestionStatus|null $status
  * @property-read \App\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\QuestionVote> $votes
  * @property-read int|null $votes_count
@@ -91,8 +93,58 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Question whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Question whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Question whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Question whereViews($value)
  */
 	class Question extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\QuestionStatus
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $question_id
+ * @property int $answer_id
+ * @property int $answered
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Answer|null $correct_answer
+ * @property-read \App\Models\Question|null $question
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus query()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereAnswerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereAnswered($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionStatus whereUserId($value)
+ */
+	class QuestionStatus extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\QuestionView
+ *
+ * @property int $id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $user_id
+ * @property int $question_id
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView query()
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionView whereUserId($value)
+ */
+	class QuestionView extends \Eloquent {}
 }
 
 namespace App\Models{

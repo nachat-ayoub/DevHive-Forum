@@ -3,66 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
+use App\Models\QuestionStatus;
+use App\Models\QuestionView;
 use App\Models\QuestionVote;
-use App\Models\User;
+use Auth;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class QuestionController extends Controller {
     /**
-     * Display a listing of the resource with filters.
-     */
-    public function index(Request $request) {
-        $questions = Question::with('answers')->withCount('votes')->get();
-
-        foreach ($questions as $question) {
-            $question['question_total_votes'] = $question->votes->sum('value');
-
-            foreach ($question->answers as $answer) {
-                $answer['answers_total_votes'] = $answer->votes->sum('value');
-            }
-        }
-
-        $data = [
-            'questions' => $questions,
-        ];
-
-        return response()->json(['status' => 'success', 'data' => $data], 200);
-    }
-
-    /**
      * Display a listing of the resource.
      */
 
-    public function home(Request $req) {
+    public function index(Request $req) {
         $filter = $req->query('filter');
+        $order = $req->query('order') ?? 'desc';
 
         $questions = [];
 
-        if ($filter == 'hot') {
-            $questions = Question::select('questions.*')
-                ->leftJoinSub(
-                    'select question_id, sum(value) as total_votes from votes group by question_id',
-                    'votes',
-                    'questions.id',
-                    '=',
-                    'votes.question_id'
-                )
-                ->orderByDesc('votes.total_votes')
+        if ($filter === 'hot') {
+            $questions = Question::select(
+                'questions.*',
+                DB::raw('(SELECT COUNT(*) FROM answers WHERE answers.question_id = questions.id) AS answers_count'),
+                DB::raw('(SELECT COUNT(*) FROM question_votes WHERE question_votes.question_id = questions.id) AS votes_count'),
+                DB::raw('COALESCE((SELECT SUM(value) FROM question_votes WHERE question_id = questions.id), 0) AS total_votes')
+            )
+                ->orderBy('total_votes', $order)
+                ->get();
+
+        } else if ($filter === 'views') {
+            $questions = Question::select(
+                'questions.*',
+                DB::raw('(SELECT COUNT(*) FROM answers WHERE answers.question_id = questions.id) AS answers_count'),
+                DB::raw('(SELECT COUNT(*) FROM question_votes WHERE question_votes.question_id = questions.id) AS votes_count'),
+                DB::raw('(SELECT SUM(value) FROM question_votes WHERE question_id = questions.id) AS total_votes')
+            )
+                ->orderBy('views', $order)
                 ->get();
         } else {
-            $questions = Question::with('answers')->withCount('votes')->orderByDesc('created_at')->get();
-
-            foreach ($questions as $question) {
-                $question['question_total_votes'] = $question->votes->sum('value');
-
-                foreach ($question->answers as $answer) {
-                    $answer['answers_total_votes'] = $answer->votes->sum('value');
-                }
-            }
+            $questions = Question::select(
+                'questions.*',
+                DB::raw('(SELECT COUNT(*) FROM answers WHERE answers.question_id = questions.id) AS answers_count'),
+                DB::raw('(SELECT COUNT(*) FROM question_votes WHERE question_votes.question_id = questions.id) AS votes_count'),
+                DB::raw('(SELECT SUM(value) FROM question_votes WHERE question_id = questions.id) AS total_votes')
+            )
+                ->orderBy('created_at', $order)
+                ->get();
         }
 
         $data = [
+            'order' => $order,
             'filter' => $filter,
             'questions' => $questions,
         ];
@@ -78,8 +69,9 @@ class QuestionController extends Controller {
             $question_data = $request->validate([
                 'title' => 'required|unique:questions|max:255',
                 'body' => 'required',
-                'user_id' => 'required|exists:users,id',
             ]);
+
+            $question_data['user_id'] = Auth::user()->id;
 
             // If validation passes, create a new question
             $question = Question::create($question_data);
@@ -103,6 +95,17 @@ class QuestionController extends Controller {
             return response()->json([
                 'status' => 'error', 'data' => ['message' => 'Question not found.'],
             ], 404);
+        }
+
+        // TODO: increment views if user exists and it's first time viewing this question:
+        if (auth('sanctum')->check()) {
+            $user = auth('sanctum')->user();
+
+            if (!QuestionView::where('user_id', $user->id)->where('question_id', $question->id)->exists()) {
+
+                $question->increment('views');
+                QuestionView::create(['user_id' => $user->id, 'question_id' => $question->id]);
+            }
         }
 
         return response()->json([
@@ -132,12 +135,21 @@ class QuestionController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id) {
+
         $question = Question::find($id);
 
         if (!$question) {
             return response()->json([
                 'status' => 'error', 'data' => ['message' => 'Question not found.'],
             ], 404);
+        }
+
+        // DONE: check if user has authorization:
+        $user = Auth::user();
+        if ($user->id != $question->user_id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't update this Question, it's not your's."],
+            ], 400);
         }
 
         $question_data = $request->validate([
@@ -165,6 +177,13 @@ class QuestionController extends Controller {
                 'status' => 'error', 'data' => ['message' => 'Question not found.'],
             ], 404);
         }
+        // TODO: check if user has authorization:
+        $user = Auth::user();
+        if ($user->id != $question->user_id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't delete this Question, it's not your's."],
+            ], 400);
+        }
 
         $question->delete();
 
@@ -191,9 +210,16 @@ class QuestionController extends Controller {
             ], 404);
         }
 
-        // Save vote
-        // TODO: later get the user from the token (user will be in $request) :
-        $user = User::find(1);
+        //  * Save vote
+        // DONE: later get the user from the token :
+        $user = Auth::user();
+
+        // DONE: check if user resource (selfe voting not allowed) :
+        if ($user->id === $question->user_id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't vote for your own Question, it's not allowed."],
+            ], 400);
+        }
 
         $already_voted = QuestionVote::where('question_id', $question->id)->where('user_id', $user->id)->get();
 
@@ -233,4 +259,102 @@ class QuestionController extends Controller {
             ],
         ], 204);
     }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function set_status(Request $request, string $id) {
+        $question = Question::find($id);
+
+        if (!$question) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => 'Question not found.'],
+            ], 404);
+        }
+
+        // DONE: check if user has authorization:
+        $user = Auth::user();
+
+        if ($user->id != $question->user_id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't update this Question, it's not your's."],
+            ], 400);
+        }
+
+        $question_status_data = $request->validate([
+            'answer_id' => 'required|exists:answers,id',
+            'answered' => 'required|boolean',
+        ]);
+
+        $question_status_data['question_id'] = $question->id;
+        $question_status_data['user_id'] = $user->id;
+
+        // TODO: check if question already have a status:
+        $question_status = QuestionStatus::where('question_id', $question->id)->where('user_id', $user->id);
+
+        $message = '';
+
+        if ($question_status->exists()) {
+            // TODO: update status :
+            $question_status->update($question_status_data);
+
+            $message = 'Question status updated successfully';
+        } else {
+            // TODO: create status :
+            QuestionStatus::create($question_status_data);
+            $message = 'Question status created successfully';
+        }
+
+        return response()->json([
+            'status' => 'success', 'data' => [
+                'message' => $message,
+                'question_status' => QuestionStatus::where('question_id', $question->id)->where('user_id', $user->id)->first(),
+            ],
+        ], 200);
+    }
+
+    /**
+     * destroy the specified resource in storage.
+     */
+    public function destroy_status(Request $request, string $id) {
+
+        $question = Question::find($id);
+
+        if (!$question) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => 'Question not found.'],
+            ], 404);
+        }
+
+        // DONE: check if user has authorization:
+        $user = Auth::user();
+        if ($user->id != $question->user_id) {
+            return response()->json([
+                'status' => 'error', 'data' => ['message' => "You can't update this Question, it's not your's."],
+            ], 400);
+        }
+
+        // TODO: check if question already have a status:
+        $question_status = QuestionStatus::whereQuestionId($question->id)->whereUserId($user->id);
+
+        if (!$question_status->exists()) {
+            // TODO: status not found :
+            return response()->json([
+                'status' => 'error', 'data' => [
+                    'message' => 'Question status does not exists.',
+                ],
+            ], 404);
+
+        }
+
+        // TODO: delete status :
+        $question_status->delete();
+
+        return response()->json([
+            'status' => 'success', 'data' => [
+                'message' => 'Question status deleted successfully',
+            ],
+        ], 204);
+    }
+
 }

@@ -17,7 +17,7 @@ class QuestionVoteFactory extends Factory {
     {
         $vote_values = [1, -1];
         return [
-            'user_id' => fake()->numberBetween(1, 2),
+            'user_id' => fake()->numberBetween(2, 3),
             'question_id' => fake()->numberBetween(1, 2),
             'value' => $vote_values[rand(0, 1)],
         ];
