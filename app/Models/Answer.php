@@ -13,12 +13,16 @@ class Answer extends Model {
         'body', 'user_id', 'question_id',
     ];
 
+    protected $casts = [
+        'total_votes' => 'integer',
+    ];
+
     public function user() {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function question() {
-        return $this->hasOne(Question::class);
+        return $this->belongsTo(Question::class);
     }
 
     public function votes() {

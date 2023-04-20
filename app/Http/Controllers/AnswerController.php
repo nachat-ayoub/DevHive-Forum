@@ -36,8 +36,8 @@ class AnswerController extends Controller {
                 'status' => 'success', 'data' => ['answer' => $answer],
             ], 200);
 
-        } catch (\Illuminate\Validation\ValidationException$th) {
-            return $th->validator->errors();
+        } catch (ValidationException $exception) {
+            return $exception->validator->errors();
         }
     }
 

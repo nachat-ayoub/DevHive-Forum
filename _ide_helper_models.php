@@ -20,8 +20,8 @@ namespace App\Models{
  * @property int $question_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Question|null $question
- * @property-read \Illuminate\Foundation\Auth\User|null $user
+ * @property-read \App\Models\Question $question
+ * @property-read \Illuminate\Foundation\Auth\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AnswerVote> $votes
  * @property-read int|null $votes_count
  * @method static \Database\Factories\AnswerFactory factory($count = null, $state = [])

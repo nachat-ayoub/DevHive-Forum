@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Question;
 use App\Models\QuestionStatus;
 use App\Models\QuestionView;
@@ -89,13 +90,29 @@ class QuestionController extends Controller {
      * Display the specified resource.
      */
     public function show(string $id) {
-        $question = Question::with('answers')->withCount('votes')->get()->find($id);
+        // $question = Question::with('answers')->withCount('votes')->get()->find($id);
+        $question = Question::select(
+            'questions.*',
+            DB::raw('(SELECT COUNT(*) FROM answers WHERE answers.question_id = questions.id) AS answers_count'),
+            DB::raw('(SELECT COUNT(*) FROM question_votes WHERE question_votes.question_id = questions.id) AS votes_count'),
+            DB::raw('COALESCE((SELECT SUM(value) FROM question_votes WHERE question_id = questions.id), 0) AS total_votes')
+        )->get()->find($id);
 
         if (!$question) {
             return response()->json([
                 'status' => 'error', 'data' => ['message' => 'Question not found.'],
             ], 404);
         }
+
+        $answers = Answer::select(
+            'answers.*',
+            DB::raw('(SELECT COUNT(*) FROM answer_votes WHERE answer_votes.answer_id = answers.id) AS votes_count'),
+            DB::raw('COALESCE((SELECT SUM(value) FROM answer_votes WHERE answer_id = answers.id), 0) AS total_votes'),
+        )->whereQuestionId($id)->with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'created_at', 'updated_at');
+        }, 'votes'])->get();
+
+        $question['answers'] = $answers;
 
         // TODO: increment views if user exists and it's first time viewing this question:
         if (auth('sanctum')->check()) {
